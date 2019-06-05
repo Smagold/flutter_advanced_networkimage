@@ -277,32 +277,35 @@ class _TransitionToImageState extends State<TransitionToImage>
   }
 
   void _resolveStatus() {
-    setState(() {
-      switch (_status) {
-        case _TransitionStatus.start:
-          if (_imageInfo == null) {
-            _status = _TransitionStatus.loading;
-          } else {
-            _status = _TransitionStatus.completed;
-            _controller.forward(from: 1.0);
-          }
-          break;
-        case _TransitionStatus.loading:
-          if (_imageInfo != null) {
-            _status = _TransitionStatus.animating;
-            _controller.forward(from: 0.0);
-          }
-          break;
-        case _TransitionStatus.animating:
-          if (_controller.status == AnimationStatus.completed)
-            _status = _TransitionStatus.completed;
-          break;
-        case _TransitionStatus.completed:
-          break;
-        case _TransitionStatus.failed:
-          break;
-      }
-    });
+    switch (_status) {
+      case _TransitionStatus.start:
+        if (_imageInfo == null) {
+          _status = _TransitionStatus.loading;
+        } else {
+          _status = _TransitionStatus.completed;
+          _controller.forward(from: 1.0);
+        }
+        break;
+      case _TransitionStatus.loading:
+        if (_imageInfo != null) {
+          _status = _TransitionStatus.animating;
+          _controller.forward(from: 0.0);
+        }
+        break;
+      case _TransitionStatus.animating:
+        if (_controller.status == AnimationStatus.completed)
+          _status = _TransitionStatus.completed;
+        break;
+      case _TransitionStatus.completed:
+        break;
+      case _TransitionStatus.failed:
+        break;
+    }
+    if (mounted) {
+      setState(() {
+        // empty intentionally
+      });
+    }
   }
 
   void _getImage({bool reload: false}) {
