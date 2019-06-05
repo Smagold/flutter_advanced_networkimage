@@ -346,9 +346,9 @@ class _TransitionToImageState extends State<TransitionToImage>
           widget.loadedCallback();
         else if (widget.loadFailedCallback != null) widget.loadFailedCallback();
       }
-      setState(() => _status = _TransitionStatus.completed);
+      _updateStatus(_TransitionStatus.completed);
     } else {
-      setState(() => _status = _TransitionStatus.start);
+      _updateStatus(_TransitionStatus.start);
       oldImageStream?.removeListener(ImageStreamListener(_updateImage));
       _imageStream.addListener(
         ImageStreamListener(_updateImage, onError: _catchBadImage),
@@ -368,11 +368,20 @@ class _TransitionToImageState extends State<TransitionToImage>
 
   void _catchBadImage(dynamic exception, StackTrace stackTrace) {
     if (widget.printError) debugPrint(exception.toString());
-    setState(() => _status = _TransitionStatus.failed);
+    _updateStatus(_TransitionStatus.failed);
     _resolveStatus();
     if (widget.loadFailedCallback != null) widget.loadFailedCallback();
     if (widget.disableMemoryCache || widget.disableMemoryCacheIfFailed)
       _imageProvider.evict();
+  }
+
+  void _updateStatus(_TransitionStatus status) {
+    _status = status;
+    if (mounted) {
+      setState(() {
+        // empty intentionally
+      });
+    }
   }
 
   @override
